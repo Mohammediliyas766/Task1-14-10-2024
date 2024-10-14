@@ -1,0 +1,22 @@
+name: Request Approval for Merge
+
+on:
+  pull_request:
+    types: [opened, edited, reopened]
+
+jobs:
+  request-approval:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notify Approver
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.google.com  # Update with your SMTP server
+        server_port: 587  # Commonly 587 or 465
+        username: ${{ secrets.EMAIL_USERNAME }}  # Store your email username in GitHub Secrets
+        password: ${{ secrets.EMAIL_PASSWORD }}  # Store your email password in GitHub Secrets
+        subject: "Approval Request for Merge to Master"
+        to: mohil@eg.dk  # Approver's email address
+        body: |
+          A new pull request has been created to merge changes into the master branch.
+          Please review the changes here: ${{ github.event.pull_request.html_url }}
