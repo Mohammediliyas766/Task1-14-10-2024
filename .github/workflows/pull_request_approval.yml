@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4.2.1
 
       - name: Send email notification
         env:
@@ -24,14 +24,14 @@ jobs:
               {
                 "to": [
                   {
-                    "email": "approver@example.com"
+                    "email": "mohil@eg.dk"
                   }
                 ],
                 "subject": "Approval Request for Pull Request"
               }
             ],
             "from": {
-              "email": "noreply@example.com"
+              "email": "noreply@mohil@eg.dk"
             },
             "content": [
               {
