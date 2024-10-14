@@ -51,4 +51,4 @@ jobs:
         uses: peter-evans/merge-pull-request@v3
         with:
           pull-request-number: ${{ github.event.pull_request.number }}
-          merge-method: squash # Choose merge method: merge, squash, or rebase
+          merge-method: squash
