@@ -16,7 +16,7 @@ jobs:
         username: ${{ secrets.EMAIL_USERNAME }}  # Store your email username in GitHub Secrets
         password: ${{ secrets.EMAIL_PASSWORD }}  # Store your email password in GitHub Secrets
         subject: "Approval Request for Merge to Master"
-        to: mohil@eg.dk  # Approver's email address
+        to: mohil@eg.dk 
         body: |
           A new pull request has been created to merge changes into the master branch.
           Please review the changes here: ${{ github.event.pull_request.html_url }}
