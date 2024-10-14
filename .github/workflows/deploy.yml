@@ -1,0 +1,39 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.0'  # Specify the .NET version you want to use
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build the project
+      run: dotnet build --no-restore
+
+    - name: Run tests
+      run: dotnet test --no-build --verbosity normal
+
+    - name: Publish application
+      run: dotnet publish -c Release -o ./output
+
+    - name: Upload to Octopus Deploy
+      uses: OctopusDeploy/octopus-cli@v2.1.0
+      with:
+        octopus_server: ${{ secrets.OCTOPUS_SERVER }}  # Your Octopus Deploy server
+        api_key: ${{ secrets.OCTOPUS_API_KEY }}  # Your Octopus Deploy API key
+        project: Deploy App  # Name of the project in Octopus Deploy
+        package_path: ./output  # Path to the published application
