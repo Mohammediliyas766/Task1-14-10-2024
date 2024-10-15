@@ -16,13 +16,20 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.0.x'
+          dotnet-version: '8.0.x'
 
       - name: Build the project
         run: dotnet build
 
-      - name: Create a release artifact
-        run: dotnet publish --configuration Release
+      - name: Publish the project
+        run: dotnet publish --configuration Release --output ./publish_output
 
-      - name: Deploy to Octopus
-        run: echo "Deploying to Octopus..."  # Integrate with Octopus Deploy CLI
+      - name: Copy files to local folder
+        run: |
+          cp -r ./publish_output/* /"C:\Users\mohil\ILIYAS\Courses\Devops\Task 1 - 14-10-2024\publish\HelloWorldApi.exe"
+
+      - name: Run the application
+        run: |
+          # Run the application from the deployed folder
+          cd "C:\Users\mohil\ILIYAS\Courses\Devops\Task 1 - 14-10-2024\publish\"
+          dotnet HelloWorldApi.dll 
