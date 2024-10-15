@@ -1,6 +1,5 @@
 name: Pull Request Approval
 
-
 on:
   pull_request:
     types: [opened, edited, reopened]
@@ -13,34 +12,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.2.1
 
-      - name: Send email notification
-        env:
-          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+      - name: Install mailsend for SMTP
         run: |
-          curl -X POST "https://api.sendgrid.com/v3/mail/send" \
-          -H "Authorization: Bearer $SENDGRID_API_KEY" \
-          -H "Content-Type: application/json" \
-          -d '{
-            "personalizations": [
-              {
-                "to": [
-                  {
-                    "email": "mohil@eg.dk"
-                  }
-                ],
-                "subject": "Approval Request for Pull Request"
-              }
-            ],
-            "from": {
-              "email": "noreply@mohil@eg.dk"
-            },
-            "content": [
-              {
-                "type": "text/plain",
-                "value": "A new pull request has been created. Please review it."
-              }
-            ]
-          }'
+          sudo apt-get update
+          sudo apt-get install mailsend
+
+      - name: Send email notification via smtp4dev
+        run: |
+          mailsend -smtp smtp4dev -port 25 -t mohil@eg.dk -f noreply@mohil@eg.dk \
+          -sub "Approval Request for Pull Request" \
+          -M "A new pull request has been created. Please review it."
 
   approve-pr:
     runs-on: ubuntu-latest
