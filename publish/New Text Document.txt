@@ -1,0 +1,25 @@
+name: Deploy to Local Machine
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.0.x' # Specify your .NET version
+
+      - name: Build and publish
+        run: dotnet publish -c Release -o ./publish
+
+      - name: Transfer files to local machine
+        run: |
+          scp -r ./publish user@local-machine:/"C:\Users\mohil\ILIYAS\Courses\Devops\Task 1 - 14-10-2024\publish"/
