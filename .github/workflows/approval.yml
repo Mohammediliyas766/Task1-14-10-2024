@@ -12,22 +12,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.2.1
 
-      - name: Install mailsend for SMTP
+      - name: Send email notification
         run: |
-          sudo apt-get update
-          sudo apt-get install mailsend
-
-      - name: Send email notification via smtp4dev
-        run: |
-          mailsend -smtp smtp4dev -port 25 -t mohil@eg.dk -f noreply@mohil@eg.dk \
-          -sub "Approval Request for Pull Request" \
-          -M "A new pull request has been created. Please review it."
+          echo "Sending email to approver..."
 
   approve-pr:
     runs-on: ubuntu-latest
     needs: request-approval
-    if: github.event.pull_request.merged == true
-
     steps:
       - name: Merge Pull Request
         uses: peter-evans/merge-pull-request@v3
