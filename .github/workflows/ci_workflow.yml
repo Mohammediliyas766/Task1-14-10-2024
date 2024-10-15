@@ -21,16 +21,16 @@ jobs:
       - name: Build project
         run: dotnet build --configuration Release
 
-      - name: Scan with Checkmarx
-        env:
-          CHECKMARX_URL: ${{ secrets.CHECKMARX_URL }}  # Your Checkmarx instance URL
-          CHECKMARX_USERNAME: ${{ secrets.CHECKMARX_USERNAME }}  # Your Checkmarx username
-          CHECKMARX_PASSWORD: ${{ secrets.CHECKMARX_PASSWORD }}  # Your Checkmarx password
-        run: |
-          echo "Scanning code with Checkmarx..."
-          # Command to initiate Checkmarx scan
-          # This is an example command; replace it with your actual Checkmarx CLI command
-          checkmarx-cli scan --url $CHECKMARX_URL --username $CHECKMARX_USERNAME --password $CHECKMARX_PASSWORD
+      # - name: Scan with Checkmarx
+      #   env:
+      #     CHECKMARX_URL: ${{ secrets.CHECKMARX_URL }}  # Your Checkmarx instance URL
+      #     CHECKMARX_USERNAME: ${{ secrets.CHECKMARX_USERNAME }}  # Your Checkmarx username
+      #     CHECKMARX_PASSWORD: ${{ secrets.CHECKMARX_PASSWORD }}  # Your Checkmarx password
+      #   run: |
+      #     echo "Scanning code with Checkmarx..."
+      #     # Command to initiate Checkmarx scan
+      #     # This is an example command; replace it with your actual Checkmarx CLI command
+      #     checkmarx-cli scan --url $CHECKMARX_URL --username $CHECKMARX_USERNAME --password $CHECKMARX_PASSWORD
 
       - name: Publish Artifact
         run: |
@@ -38,15 +38,15 @@ jobs:
           dotnet publish -c Release -o ./output
           echo "Artifact published to ./output."
 
-      # - name: Upload Artifact to Octopus Deploy
-      #   env:
-      #     OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}  # Your Octopus Deploy API key
-      #     OCTOPUS_SERVER: ${{ secrets.OCTOPUS_SERVER }}  # Your Octopus Deploy server URL
-      #   run: |
-      #     echo "Uploading artifact to Octopus Deploy..."
-      #     curl -X POST "$OCTOPUS_SERVER/api/packages/raw" \
-      #          -H "X-Octopus-ApiKey: $OCTOPUS_API_KEY" \
-      #          -F "file=@./output/your_project_name.zip" \
-      #          -F "version=1.0.0" \
-      #          -F "packageId=YourPackageId"
-      #     echo "Artifact uploaded to Octopus Deploy."
+      - name: Upload Artifact to Octopus Deploy
+        env:
+          OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}  # Your Octopus Deploy API key
+          OCTOPUS_SERVER: ${{ secrets.OCTOPUS_SERVER }}  # Your Octopus Deploy server URL
+        run: |
+          echo "Uploading artifact to Octopus Deploy..."
+          curl -X POST "$OCTOPUS_SERVER/api/packages/raw" \
+               -H "X-Octopus-ApiKey: $OCTOPUS_API_KEY" \
+               -F "file=@./output/your_project_name.zip" \
+               -F "version=1.0.0" \
+               -F "packageId=YourPackageId"
+          echo "Artifact uploaded to Octopus Deploy."
