@@ -24,30 +24,30 @@ jobs:
           python -m pip install secure-smtplib
           echo "Sending email to $EMAIL for PR approval..."
           python - <<EOF
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-
-# SMTP server configuration
-smtp_server = "$SMTP_SERVER"
-smtp_port = $SMTP_PORT
-sender_email = "$SENDER_EMAIL"
-receiver_email = "$EMAIL"
-
-# Create the email message
-msg = MIMEMultipart()
-msg['From'] = sender_email
-msg['To'] = receiver_email
-msg['Subject'] = "$EMAIL_SUBJECT"
-
-# Add body to the email
-msg.attach(MIMEText("$EMAIL_BODY", 'plain'))
-
-# Send the email
-try:
-    with smtplib.SMTP(smtp_server, smtp_port) as server:
-        server.sendmail(sender_email, receiver_email, msg.as_string())
-        print("Email sent to $EMAIL.")
-except Exception as e:
-    print(f"Failed to send email: {e}")
-EOF
+          import smtplib
+          from email.mime.text import MIMEText
+          from email.mime.multipart import MIMEMultipart
+          
+          # SMTP server configuration
+          smtp_server = "$SMTP_SERVER"
+          smtp_port = $SMTP_PORT
+          sender_email = "$SENDER_EMAIL"
+          receiver_email = "$EMAIL"
+          
+          # Create the email message
+          msg = MIMEMultipart()
+          msg['From'] = sender_email
+          msg['To'] = receiver_email
+          msg['Subject'] = "$EMAIL_SUBJECT"
+          
+          # Add body to the email
+          msg.attach(MIMEText("$EMAIL_BODY", 'plain'))
+          
+          # Send the email
+          try:
+              with smtplib.SMTP(smtp_server, smtp_port) as server:
+                  server.sendmail(sender_email, receiver_email, msg.as_string())
+                  print("Email sent to $EMAIL.")
+          except Exception as e:
+              print(f"Failed to send email: {e}")
+          EOF
