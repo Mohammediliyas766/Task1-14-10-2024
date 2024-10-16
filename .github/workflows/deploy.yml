@@ -34,14 +34,14 @@ jobs:
         uses: OctopusDeploy/push-package-action@v1
         with:
           package: './output/YourApp.zip'  # Path to the built app package
-          server: ${{ secrets.OCTOPUS_SERVER_URL }}
+          server: ${{ secrets.OCTOPUS_SERVER }}
           api_key: ${{ secrets.OCTOPUS_API_KEY }}
 
       # Create a release in Octopus Deploy
       - name: Create Release in Octopus Deploy
         uses: OctopusDeploy/create-release-action@v1
         with:
-          project: "Your Project Name"
+          project: "Hello World API"
           version: "1.0.0"  # Sync with GitHub release versioning
-          server: ${{ secrets.OCTOPUS_SERVER_URL }}
+          server: ${{ secrets.OCTOPUS_SERVER }}
           api_key: ${{ secrets.OCTOPUS_API_KEY }}
