@@ -1,0 +1,77 @@
+name: PR Approval and Merge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+jobs:
+  notify-approver:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send approval request email
+        uses: dawidd6/action-send-mail@v2
+        with:
+          server_address: localhost
+          server_port: 25
+          secure: false
+          username: ""
+          password: ""
+          subject: "Action Required: Approval Needed for PR #${{github.event.pull_request.number}}"
+          body: |
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Pull Request Approval Required</title>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { background-color: #0366d6; color: white; padding: 10px; text-align: center; }
+                    .content { background-color: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 3px; padding: 20px; margin-top: 20px; }
+                    .button { display: inline-block; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 3px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>Pull Request Approval Required</h1>
+                    </div>
+                    <div class="content">
+                        <p>Hello Approver,</p>
+                        <p>A new pull request requires your attention and approval:</p>
+                        <ul>
+                            <li><strong>PR Number:</strong> #${{github.event.pull_request.number}}</li>
+                            <li><strong>Title:</strong> ${{github.event.pull_request.title}}</li>
+                            <li><strong>Author:</strong> ${{github.event.pull_request.user.login}}</li>
+                        </ul>
+                        <p>Please review the changes and take appropriate action.</p>
+                        <a href="${{github.event.pull_request.html_url}}" class="button">Review Pull Request</a>
+                    </div>
+                </div>
+            </body>
+            </html>
+          to: spooj@eg.dk
+          from: GitHub Actions <noreply@github.com>
+          content_type: text/html
+
+  merge-pr:
+    needs: notify-approver
+    runs-on: ubuntu-latest
+    if: github.event.review.state == 'approved'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Merge PR
+        uses: pascalgn/automerge-action@v0.15.6
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          MERGE_LABELS: ""
+          MERGE_METHOD: "squash"
+          MERGE_COMMIT_MESSAGE: "Pull request #{pullRequest.number} merged"
+          MERGE_FORKS: "false"
+          MERGE_RETRIES: "6"
+          MERGE_RETRY_SLEEP: "10000"
