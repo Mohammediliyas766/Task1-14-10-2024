@@ -68,7 +68,7 @@ jobs:
       - name: Merge PR
         uses: pascalgn/automerge-action@v0.15.6
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.GIT_TOKEN}}
           MERGE_LABELS: ""
           MERGE_METHOD: "squash"
           MERGE_COMMIT_MESSAGE: "Pull request #{pullRequest.number} merged"
