@@ -27,7 +27,7 @@ jobs:
 
       # Package the app 
       - name: Publish the app
-        run: dotnet publish -c Release -o ./"C:\Users\mohil\ILIYAS\Courses\Devops\Task 1 - 14-10-2024\HelloWorldApi"
+        run: dotnet publish -c Release -o ./output
 
       # Upload the build artifact to Octopus Deploy
       - name: Push Package to Octopus Deploy
