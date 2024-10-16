@@ -1,0 +1,47 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      # Setup .NET environment
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
+      # Restore dependencies and build
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build the app
+        run: dotnet build --configuration Release
+
+      # Package the app 
+      - name: Publish the app
+        run: dotnet publish -c Release -o ./output
+
+      # Upload the build artifact to Octopus Deploy
+      - name: Push Package to Octopus Deploy
+        uses: OctopusDeploy/push-package-action@v1
+        with:
+          package: './output/YourApp.zip'  # Path to the built app package
+          server: ${{ secrets.OCTOPUS_SERVER }}
+          api_key: ${{ secrets.OCTOPUS_API_KEY }}
+
+      # Create a release in Octopus Deploy
+      - name: Create Release in Octopus Deploy
+        uses: OctopusDeploy/create-release-action@v1
+        with:
+          project: "Hello World API"
+          version: "1.0.0"  # Sync with GitHub release versioning
+          server: ${{ secrets.OCTOPUS_SERVER }}
+          api_key: ${{ secrets.OCTOPUS_API_KEY }}
