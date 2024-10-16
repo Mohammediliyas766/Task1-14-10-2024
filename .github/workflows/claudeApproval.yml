@@ -16,8 +16,8 @@ jobs:
           server_address: localhost
           server_port: 25
           secure: false
-          username: ""
-          password: ""
+          username: "dummy"
+          password: "dummy"
           subject: "Action Required: Approval Needed for PR #${{github.event.pull_request.number}}"
           body: |
             <!DOCTYPE html>
