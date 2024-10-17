@@ -1,38 +1,38 @@
 name: Build and Deploy
- 
+
 on:
   push:
     branches:
       - main
- 
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
- 
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
- 
+
     - name: Set up .NET
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '8.x'
- 
+
     - name: Restore dependencies
       run: dotnet restore
- 
+
     - name: Build
       run: dotnet publish -o build
- 
+
     - name: Install Octopus CLI
       uses: OctopusDeploy/install-octopus-cli-action@v3.0.0
       with:
         version: latest
- 
+
     - name: Package build artifacts
       run: |
-        octo pack --id="HelloWorldAPI" --format="zip" --version="1.0.${{ github.run_number }}" --basePath="./build"
- 
+        ./octo pack --id="HelloWorldAPI" --format="zip" --version="1.0.${{ github.run_number }}" --basePath="./build"
+
     - name: Push package to Octopus Deploy
       uses: OctopusDeploy/push-package-action@v1.0.1
       with:
@@ -40,7 +40,7 @@ jobs:
         server: ${{ secrets.OCTOPUS_SERVER }}
         space: 'Default'
         packages: 'HelloWorldAPI.1.0.${{ github.run_number }}.zip'
- 
+
     - name: Create a release in Octopus Deploy
       uses: OctopusDeploy/create-release-action@v3.0.5
       with:
