@@ -1,0 +1,12 @@
+step "deploy-a-release" {
+    name = "Deploy a Release"
+
+    action {
+        action_type = "Octopus.DeployRelease"
+        properties = {
+            Octopus.Action.DeployRelease.DeploymentCondition = "Always"
+            Octopus.Action.DeployRelease.ProjectId = "hello-world-api"
+        }
+        worker_pool_variable = ""
+    }
+}
