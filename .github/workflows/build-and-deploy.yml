@@ -1,0 +1,50 @@
+name: Build and Deploy
+ 
+on:
+  push:
+    branches:
+      - main
+ 
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+ 
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+ 
+    - name: Restore dependencies
+      run: dotnet restore
+ 
+    - name: Build
+      run: dotnet publish -o build
+ 
+    - name: Install Octopus CLI
+      uses: OctopusDeploy/install-octopus-cli-action@v1.1.6
+      with:
+        version: latest
+ 
+    - name: Package build artifacts
+      run: |
+        octo pack --id="MyApp" --format="zip" --version="1.0.${{ github.run_number }}" --basePath="./build"
+ 
+    - name: Push package to Octopus Deploy
+      uses: OctopusDeploy/push-package-action@v1.0.1
+      with:
+        api_key: ${{ secrets.OCTOPUS_API_KEY }}
+        server: ${{ secrets.OCTOPUS_SERVER }}
+        space: 'Default'
+        packages: 'MyApp.1.0.${{ github.run_number }}.zip'
+ 
+    - name: Create a release in Octopus Deploy
+      uses: OctopusDeploy/create-release-action@v1.0.2
+      with:
+        api_key: ${{ secrets.OCTOPUS_API_KEY }}
+        server: ${{ secrets.OCTOPUS_SERVER }}
+        project: 'MyProject'
+        deploy_to: 'Development'
