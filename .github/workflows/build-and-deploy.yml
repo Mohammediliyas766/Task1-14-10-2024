@@ -22,29 +22,27 @@ jobs:
       run: dotnet publish -c Release -o ./build
 
     - name: Install Octopus CLI
-      uses: OctopusDeploy/install-octopus-cli-action@v3.0.0
-      with:
-        version: latest
-
-    - name: Add Octopus CLI to PATH
-      run: echo "${{ github.workspace }}\octo" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      run: |
+        $InstallPath = "$env:USERPROFILE\.octopus"
+        $OctoVersion = "latest"
+        Invoke-WebRequest -Uri "https://octopus.com/downloads/octopuscli/win-x64/$OctoVersion" -OutFile "$InstallPath\octo.zip"
+        Expand-Archive -Path "$InstallPath\octo.zip" -DestinationPath $InstallPath -Force
+        echo "$InstallPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
     - name: Package build artifacts
       run: |
-        octo.exe pack --id="HelloWorldAPI" --format="zip" --version="1.0.${{ github.run_number }}" --basePath="./build"
+        octo pack --id="HelloWorldAPI" --format="zip" --version="1.0.${{ github.run_number }}" --basePath="./build"
 
     - name: Push package to Octopus Deploy
-      uses: OctopusDeploy/push-package-action@v1.0.1
-      with:
-        api_key: ${{ secrets.OCTOPUS_API_KEY }}
-        server: ${{ secrets.OCTOPUS_SERVER }}
-        space: 'Default'
-        packages: 'HelloWorldAPI.1.0.${{ github.run_number }}.zip'
+      env:
+        OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
+        OCTOPUS_HOST: ${{ secrets.OCTOPUS_SERVER }}
+      run: |
+        octo push --package="HelloWorldAPI.1.0.${{ github.run_number }}.zip" --server="$env:OCTOPUS_HOST" --apiKey="$env:OCTOPUS_API_KEY" --space="Default"
 
     - name: Create a release in Octopus Deploy
-      uses: OctopusDeploy/create-release-action@v3.0.5
-      with:
-        api_key: ${{ secrets.OCTOPUS_API_KEY }}
-        server: ${{ secrets.OCTOPUS_SERVER }}
-        project: 'Hello World API'
-        deploy_to: 'Development'
+      env:
+        OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
+        OCTOPUS_HOST: ${{ secrets.OCTOPUS_SERVER }}
+      run: |
+        octo create-release --project="Hello World API" --deployTo="Development" --server="$env:OCTOPUS_HOST" --apiKey="$env:OCTOPUS_API_KEY" --space="Default"
