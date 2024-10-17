@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest  # Change to a Windows environment
 
     steps:
     - name: Checkout code
@@ -22,7 +22,7 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet publish
+      run: dotnet publish -c Release -o ./build  # Specify output path for clarity
 
     - name: Install Octopus CLI
       uses: OctopusDeploy/install-octopus-cli-action@v3.0.0
@@ -31,7 +31,7 @@ jobs:
 
     - name: Package build artifacts
       run: |
-        ./octo pack --id="HelloWorldAPI" --format="zip" --version="1.0.${{ github.run_number }}" --basePath="./build"
+        octo pack --id="HelloWorldAPI" --format="zip" --version="1.0.${{ github.run_number }}" --basePath="./build"
 
     - name: Push package to Octopus Deploy
       uses: OctopusDeploy/push-package-action@v1.0.1
