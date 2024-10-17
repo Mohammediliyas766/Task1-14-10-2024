@@ -32,18 +32,3 @@ jobs:
 
     - name: Pack project
       run: dotnet publish -c Release -o ./artifacts
-
-    - name: Create Deployment
-      run: |
-        curl -X POST "$OCTOPUS_SERVER/api/deployments" \
-        -H "X-Octopus-ApiKey: ${{ secrets.OCTOPUS_API_KEY }}" \
-        -H "Content-Type: application/json" \
-        -d '{
-              "ReleaseId": "Releases-123",
-              "EnvironmentId": "Environments-456",
-              "ProjectId": "Projects-789",
-              "Comments": "Automated deployment from GitHub Actions"
-            }'
-      env:
-        OCTOPUS_SERVER: ${{ secrets.OCTOPUS_SERVER }}
-        OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
