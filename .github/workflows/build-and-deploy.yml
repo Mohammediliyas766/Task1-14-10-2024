@@ -41,9 +41,18 @@ jobs:
       run: |
         octo push --package="HelloWorldAPI.1.0.${{ github.run_number }}.zip" --server="$env:OCTOPUS_HOST" --apiKey="$env:OCTOPUS_API_KEY" --space="Default"
 
+    - name: List Octopus Deploy Projects
+      env:
+        OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
+        OCTOPUS_HOST: ${{ secrets.OCTOPUS_SERVER }}
+      run: |
+        octo list-projects --server="$env:OCTOPUS_HOST" --apiKey="$env:OCTOPUS_API_KEY" --space="Default"
+
     - name: Create a release in Octopus Deploy
       env:
         OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
         OCTOPUS_HOST: ${{ secrets.OCTOPUS_SERVER }}
       run: |
-        octo create-release --project="Hello World API" --deployTo="Development" --server="$env:OCTOPUS_HOST" --apiKey="$env:OCTOPUS_API_KEY" --space="Default"
+        $projectName = "Hello World API"
+        Write-Host "Attempting to create release for project: $projectName"
+        octo create-release --project="$projectName" --deployTo="Development" --server="$env:OCTOPUS_HOST" --apiKey="$env:OCTOPUS_API_KEY" --space="Default"
