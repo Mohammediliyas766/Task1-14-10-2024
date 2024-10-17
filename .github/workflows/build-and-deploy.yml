@@ -22,7 +22,7 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet publish -o build
+      run: dotnet publish
 
     - name: Install Octopus CLI
       uses: OctopusDeploy/install-octopus-cli-action@v3.0.0
