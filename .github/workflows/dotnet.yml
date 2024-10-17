@@ -19,7 +19,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: '8.x' 
+        dotnet-version: '7.x'
 
     - name: Install dependencies
       run: dotnet restore
@@ -29,3 +29,15 @@ jobs:
 
     - name: Run tests
       run: dotnet test --no-restore --verbosity normal
+
+    - name: Pack project
+      run: dotnet publish -c Release -o ./artifacts
+
+    - name: Push to Octopus Deploy
+      run: |
+        curl -X POST "$OCTOPUS_SERVER/api/deployments" \
+        -H "X-Octopus-ApiKey: ${{ secrets.OCTOPUS_API_KEY }}" \
+        -d @deploy.json
+      env:
+        OCTOPUS_SERVER: ${{ secrets.OCTOPUS_SERVER }}
+        OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
