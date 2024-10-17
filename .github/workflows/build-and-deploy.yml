@@ -34,19 +34,47 @@ jobs:
       run: |
         octo pack --id="HelloWorldAPI" --format="zip" --version="1.0.${{ github.run_number }}" --basePath="./build"
 
-    - name: Push package to Octopus Deploy
+    - name: Verify Octopus Deploy Connection
       env:
         OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
         OCTOPUS_HOST: ${{ secrets.OCTOPUS_SERVER }}
       run: |
-        octo push --package="HelloWorldAPI.1.0.${{ github.run_number }}.zip" --server="$env:OCTOPUS_HOST" --apiKey="$env:OCTOPUS_API_KEY" --space="Default"
+        Write-Host "Testing connection to Octopus Deploy server: $env:OCTOPUS_HOST"
+        $result = octo list-environments --server="$env:OCTOPUS_HOST" --apiKey="$env:OCTOPUS_API_KEY"
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "Error connecting to Octopus Deploy server. Exit code: $LASTEXITCODE"
+          Write-Host "Output: $result"
+          exit 1
+        }
+        Write-Host "Connection successful. Environments:"
+        Write-Host $result
 
     - name: List Octopus Deploy Projects
       env:
         OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
         OCTOPUS_HOST: ${{ secrets.OCTOPUS_SERVER }}
       run: |
-        octo list-projects --server="$env:OCTOPUS_HOST" --apiKey="$env:OCTOPUS_API_KEY" --space="Default"
+        $result = octo list-projects --server="$env:OCTOPUS_HOST" --apiKey="$env:OCTOPUS_API_KEY"
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "Error listing projects. Exit code: $LASTEXITCODE"
+          Write-Host "Output: $result"
+          exit 1
+        }
+        Write-Host "Projects:"
+        Write-Host $result
+
+    - name: Push package to Octopus Deploy
+      env:
+        OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
+        OCTOPUS_HOST: ${{ secrets.OCTOPUS_SERVER }}
+      run: |
+        $result = octo push --package="HelloWorldAPI.1.0.${{ github.run_number }}.zip" --server="$env:OCTOPUS_HOST" --apiKey="$env:OCTOPUS_API_KEY"
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "Error pushing package. Exit code: $LASTEXITCODE"
+          Write-Host "Output: $result"
+          exit 1
+        }
+        Write-Host "Package pushed successfully"
 
     - name: Create a release in Octopus Deploy
       env:
@@ -55,4 +83,10 @@ jobs:
       run: |
         $projectName = "Hello World API"
         Write-Host "Attempting to create release for project: $projectName"
-        octo create-release --project="$projectName" --deployTo="Development" --server="$env:OCTOPUS_HOST" --apiKey="$env:OCTOPUS_API_KEY" --space="Default"
+        $result = octo create-release --project="$projectName" --deployTo="Development" --server="$env:OCTOPUS_HOST" --apiKey="$env:OCTOPUS_API_KEY"
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "Error creating release. Exit code: $LASTEXITCODE"
+          Write-Host "Output: $result"
+          exit 1
+        }
+        Write-Host "Release created successfully"
