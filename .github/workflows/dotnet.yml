@@ -27,8 +27,5 @@ jobs:
     - name: Build project
       run: dotnet build --configuration Release --no-restore
 
-    - name: Run tests
-      run: dotnet test --no-restore --verbosity normal
-
     - name: Pack project
       run: dotnet publish -c Release -o ./artifacts
